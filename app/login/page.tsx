@@ -474,7 +474,7 @@ export default function LoginPage() {
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rotate-45 bg-[#7c3aed]/40" />
               <p className="text-white/10 text-xs font-mono uppercase tracking-[0.3em]">
-                Karunya AI/ML · RISE 2026
+                MATRIX · RISE 2026
               </p>
               <div className="w-1.5 h-1.5 rotate-45 bg-[#7c3aed]/40" />
             </div>

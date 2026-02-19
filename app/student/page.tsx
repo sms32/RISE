@@ -393,7 +393,7 @@ export default function StudentPage() {
             </div>
 
             {/* Glitch title */}
-            <div className={`glitch-wrap ${glitch ? 'glitch-active' : ''}`} data-text="RISE">
+            <div className={`glitch-wrap ${glitch ? 'glitch-active' : ''}`} data-text="">
               <h1
                 className="font-black italic uppercase relative block"
                 style={{
@@ -662,7 +662,7 @@ export default function StudentPage() {
               </h1>
             </div>
             <p className="text-[#7c3aed]/70 text-xs tracking-[0.3em] mt-1 font-mono">
-              EMERGENCY TASKS WORKSHOP — KARUNYA INSTITUTE
+              RISE WORKSHOP — MATRIX
             </p>
           </div>
 
