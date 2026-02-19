@@ -535,7 +535,7 @@ export default function AdminPage() {
           <div className="flex whitespace-nowrap" style={{ animation: 'ticker 30s linear infinite' }}>
             {Array(6).fill(null).map((_, i) => (
               <span key={i} className="text-[#a78bfa] text-xs tracking-widest mx-8 font-mono">
-      
+                ◈ ADMIN CONTROL &nbsp;
                 ◈ {teams.length} TEAMS &nbsp;
                 ◈ {activeTeams} ACTIVE &nbsp;
                 ◈ {completedTeams} COMPLETED &nbsp;
@@ -550,7 +550,7 @@ export default function AdminPage() {
         <div className="relative px-6 pt-6 pb-4 border-b border-[#7c3aed]/20">
           <div className="flex items-start justify-between">
             <div>
-              <div className={`glitch-wrap ${glitch ? 'glitch-active' : ''}`} data-text="ADMIN // CONTROL">
+              <div className={`glitch-wrap ${glitch ? 'glitch-active' : ''}`} data-text="">
                 <h1 className="text-4xl font-black uppercase tracking-[0.15em] text-white"
                   style={{ textShadow: '0 0 30px rgba(124,58,237,0.5)' }}>
                   ADMIN // CONTROL
