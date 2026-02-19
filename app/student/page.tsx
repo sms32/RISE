@@ -655,7 +655,7 @@ export default function StudentPage() {
       <div className="relative px-4 sm:px-6 pt-5 pb-4 border-b border-[#7c3aed]/20">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 max-w-5xl mx-auto">
           <div>
-            <div className={`glitch-wrap ${glitch ? 'glitch-active' : ''}`} data-text="RISE 2026">
+            <div className={`glitch-wrap ${glitch ? 'glitch-active' : ''}`} data-text="">
               <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-[0.15em] text-white"
                 style={{ textShadow: '0 0 30px rgba(124,58,237,0.5)' }}>
                 RISE 2026
@@ -933,41 +933,7 @@ export default function StudentPage() {
           </div>
         </div>
 
-        {/* ── SCORING GUIDE ── */}
-        <div className="relative border border-[#7c3aed]/20 bg-[#0a0015] p-5">
-          <div className="corner-tl" /><div className="corner-tr" />
-          <div className="corner-bl" /><div className="corner-br" />
-          <p className="text-[#7c3aed]/50 text-xs tracking-[0.3em] font-mono mb-4">◈ SCORING BREAKDOWN (MAX 1000)</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            {[
-              { label: 'ACCURACY',   max: 400, desc: 'Exact=400 · ≤5°=300 · ≤10°=150 · ≤15°=50' },
-              { label: 'SPEED',      max: 400, desc: '<3s=400 · <6s=300 · <10s=150 · <14s=50'    },
-              { label: 'EFFICIENCY', max: 200, desc: '≤3 moves=200 · ≤6=150 · ≤10=80 · ≤15=30'  },
-            ].map((s) => (
-              <div key={s.label} className="text-center py-3 border border-[#7c3aed]/10 bg-[#0d0014]">
-                <p className="text-[#a78bfa] font-black text-2xl">{s.max}</p>
-                <p className="text-white/50 text-xs font-mono tracking-widest mb-1 mt-0.5">{s.label}</p>
-                <p className="text-white/20 text-[10px] font-mono px-2">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className="pt-4 border-t border-[#7c3aed]/10">
-            <p className="text-[#7c3aed]/40 text-xs font-mono tracking-widest mb-2">◈ ATTEMPT PENALTIES</p>
-            <div className="flex gap-3 flex-wrap">
-              {[
-                { label: '1st attempt', value: 'Full 1000' },
-                { label: '2nd attempt', value: 'Cap 800'   },
-                { label: '3rd attempt', value: 'Cap 600'   },
-                { label: '4th+ attempt', value: 'Cap 400'  },
-              ].map((p) => (
-                <div key={p.label} className="stat-pill bg-[#0d0014] border border-[#7c3aed]/20 px-3 py-1">
-                  <span className="text-white/30 text-xs font-mono">{p.label}: </span>
-                  <span className="text-[#a78bfa] text-xs font-mono font-bold">{p.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+      
 
       </div>
     </div>

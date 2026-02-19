@@ -292,7 +292,7 @@ export default function LoginPage() {
                 animation: 'glitchSlice1 6s infinite', letterSpacing: '-0.03em',
               }}>RISE</span>
               {/* Main — purple gradient matching admin */}
-              <div className={`glitch-wrap ${glitch ? 'glitch-active' : ''}`} data-text="RISE">
+              <div className={`glitch-wrap ${glitch ? 'glitch-active' : ''}`} data-text="">
                 <span className="relative block font-black italic uppercase" style={{
                   fontSize: 'clamp(5rem, 18vw, 13rem)',
                   background: 'linear-gradient(160deg, #fdf4ff 0%, #c4b5fd 25%, #a78bfa 55%, #7c3aed 80%, #5b21b6 100%)',
