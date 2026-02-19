@@ -3,25 +3,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 
-// ── CORS headers — required for Arduino/non-browser clients ──────────────────
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Accept, User-Agent',
 };
 
-// ── Handle OPTIONS preflight ──────────────────────────────────────────────────
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: CORS_HEADERS });
 }
 
-// ── POST /api/score ───────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { teamCode, station, score } = body;
+    const { teamCode, station, score, isFail } = body;
 
-    console.log('Score submission:', { teamCode, station, score });
+    console.log('Score submission:', { teamCode, station, score, isFail });
 
     if (!teamCode || station === undefined || score === undefined) {
       return NextResponse.json(
@@ -30,7 +27,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── Find team by teamCode ─────────────────────────────────────────────
+    const stationNum = Number(station);
+
+    // ── Check round is active for this station ────────────────────────────
+    const workshopSnap = await db.doc('workshops/feb2026').get();
+    if (workshopSnap.exists) {
+      const ws = workshopSnap.data()!;
+      if (!ws.roundActive) {
+        console.log('Rejected: round not active');
+        return NextResponse.json(
+          { error: 'Round not active' },
+          { status: 403, headers: CORS_HEADERS }
+        );
+      }
+      if (ws.activeStation !== stationNum) {
+        console.log(`Rejected: active station is ${ws.activeStation}, got ${stationNum}`);
+        return NextResponse.json(
+          { error: 'Wrong station — not your turn' },
+          { status: 403, headers: CORS_HEADERS }
+        );
+      }
+    }
+
+    // ── Find team ─────────────────────────────────────────────────────────
     const teamsSnap = await db
       .collection('teams')
       .where('teamCode', '==', teamCode)
@@ -38,7 +57,6 @@ export async function POST(req: NextRequest) {
       .get();
 
     if (teamsSnap.empty) {
-      console.log('Team not found:', teamCode);
       return NextResponse.json(
         { error: 'Team not found' },
         { status: 404, headers: CORS_HEADERS }
@@ -48,30 +66,56 @@ export async function POST(req: NextRequest) {
     const teamDoc  = teamsSnap.docs[0];
     const teamData = teamDoc.data();
 
-    const stationNum = Number(station);
-    const stationKey = `station${stationNum}Score`;
-    const completedStations: number[] = teamData.completedStations || [];
+    const attemptKey        = `station${stationNum}Attempts`;
+    const stationKey        = `station${stationNum}Score`;
+    const completedStations = teamData.completedStations || [];
+    const currentAttempts   = teamData[attemptKey] || 0;
 
-    // ── Guard: don't overwrite already submitted station ──────────────────
-    if (completedStations.includes(stationNum)) {
-      console.log('Station already completed:', stationNum);
+    // ── Always increment attempt count ────────────────────────────────────
+    await teamDoc.ref.update({
+      [attemptKey]: FieldValue.increment(1),
+    });
+
+    console.log(`Attempt #${currentAttempts + 1} for team=${teamCode} station=${stationNum}`);
+
+    // ── If fail, just register attempt — don't save score ─────────────────
+    if (isFail) {
+      console.log('Fail attempt registered — no score saved');
       return NextResponse.json(
-        { message: 'Already submitted', score: teamData[stationKey] },
+        { message: 'Fail registered', attempts: currentAttempts + 1 },
         { status: 200, headers: CORS_HEADERS }
       );
     }
 
-    // ── Update team doc ───────────────────────────────────────────────────
+    // ── Guard: already submitted a winning score ───────────────────────────
+    if (completedStations.includes(stationNum)) {
+      console.log('Already completed — keeping first score');
+      return NextResponse.json(
+        { message: 'Already submitted', score: teamData[stationKey] },
+        { status: 409, headers: CORS_HEADERS }
+      );
+    }
+
+    // ── Apply attempt penalty cap ─────────────────────────────────────────
+    let cappedScore = score;
+    if      (currentAttempts === 1) cappedScore = Math.min(score, 800);
+    else if (currentAttempts === 2) cappedScore = Math.min(score, 600);
+    else if (currentAttempts >= 3)  cappedScore = Math.min(score, 400);
+    // currentAttempts === 0 → first attempt → no cap → full score
+
+    console.log(`Score: raw=${score} attempts=${currentAttempts} capped=${cappedScore}`);
+
+    // ── Save score ────────────────────────────────────────────────────────
     await teamDoc.ref.update({
-      [stationKey]: score,
-      completedStations: FieldValue.arrayUnion(stationNum),
-      totalScore: FieldValue.increment(score),
+      [stationKey]:        cappedScore,
+      completedStations:   FieldValue.arrayUnion(stationNum),
+      totalScore:          FieldValue.increment(cappedScore),
     });
 
-    console.log(`Score saved: team=${teamCode} station=${stationNum} score=${score}`);
+    console.log(`Saved: team=${teamCode} station=${stationNum} score=${cappedScore}`);
 
     return NextResponse.json(
-      { success: true, score, station: stationNum },
+      { success: true, score: cappedScore, raw: score, attempts: currentAttempts + 1 },
       { status: 200, headers: CORS_HEADERS }
     );
 
