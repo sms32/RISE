@@ -44,7 +44,7 @@ interface WorkshopState {
 }
 
 const WORKSHOP_DOC   = 'workshops/feb2026';
-const STATION_NAMES  = ['', 'Shield', 'Oxygen', 'Override', 'Pressure'];
+const STATION_NAMES  = ['', 'Shield', 'Oxygen', 'Pressure', 'Override'];
 const STATION_COLORS = ['', '#7c3aed', '#0891b2', '#b45309', '#166534'];
 
 const formatTime = (seconds: number): string => {

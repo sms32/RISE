@@ -66,7 +66,7 @@ interface WorkshopState {
 }
 
 const WORKSHOP_DOC  = 'workshops/feb2026';
-const STATION_NAMES = ['', 'Shield', 'Oxygen', 'Override', 'Pressure'];
+const STATION_NAMES = ['', 'Shield', 'Oxygen', 'Pressure', 'Override'];
 
 const formatTime = (seconds: number): string => {
   const m = Math.floor(seconds / 60);
