@@ -535,7 +535,7 @@ export default function AdminPage() {
           <div className="flex whitespace-nowrap" style={{ animation: 'ticker 30s linear infinite' }}>
             {Array(6).fill(null).map((_, i) => (
               <span key={i} className="text-[#a78bfa] text-xs tracking-widest mx-8 font-mono">
-                ◈ ADMIN CONTROL &nbsp;
+      
                 ◈ {teams.length} TEAMS &nbsp;
                 ◈ {activeTeams} ACTIVE &nbsp;
                 ◈ {completedTeams} COMPLETED &nbsp;
