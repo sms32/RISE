@@ -9,23 +9,29 @@ export const metadata: Metadata = {
   title: "RISE 2026",
   description: "Real World IoT System Explorations",
 
-  // ── Open Graph (WhatsApp, Facebook, Telegram link previews) ──────────────
   openGraph: {
     title: "RISE 2026",
     description: "Real World IoT System Explorations",
-    url: "https://rise-black.vercel.app",
+    url: "https://rise-iot.vercel.app",
     siteName: "RISE 2026",
     type: "website",
+    images: [
+      {
+        url: "https://rise-iot.vercel.app/og.png",
+        width: 1200,
+        height: 630,
+        alt: "RISE 2026 — Real World IoT System Explorations",
+      },
+    ],
   },
 
-  // ── Twitter / X card ──────────────────────────────────────────────────────
   twitter: {
-    card: "summary",
+    card: "summary_large_image",   // ← changed from "summary" to show big image
     title: "RISE 2026",
     description: "Real World IoT System Explorations",
+    images: ["https://rise-black.vercel.app/og-image.png"],
   },
 
-  // ── Extra meta ────────────────────────────────────────────────────────────
   keywords: ["RISE", "IoT", "Workshop", "2026", "Embedded Systems"],
   authors: [{ name: "RISE 2026" }],
 };
