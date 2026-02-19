@@ -1,8 +1,21 @@
 // app/api/score/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase-admin';   // ← Admin SDK, NOT client SDK
+import { db } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 
+// ── CORS headers — required for Arduino/non-browser clients ──────────────────
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin':  '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Accept, User-Agent',
+};
+
+// ── Handle OPTIONS preflight ──────────────────────────────────────────────────
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: CORS_HEADERS });
+}
+
+// ── POST /api/score ───────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -11,7 +24,10 @@ export async function POST(req: NextRequest) {
     console.log('Score submission:', { teamCode, station, score });
 
     if (!teamCode || station === undefined || score === undefined) {
-      return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Missing fields' },
+        { status: 400, headers: CORS_HEADERS }
+      );
     }
 
     // ── Find team by teamCode ─────────────────────────────────────────────
@@ -23,7 +39,10 @@ export async function POST(req: NextRequest) {
 
     if (teamsSnap.empty) {
       console.log('Team not found:', teamCode);
-      return NextResponse.json({ error: 'Team not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Team not found' },
+        { status: 404, headers: CORS_HEADERS }
+      );
     }
 
     const teamDoc  = teamsSnap.docs[0];
@@ -38,7 +57,7 @@ export async function POST(req: NextRequest) {
       console.log('Station already completed:', stationNum);
       return NextResponse.json(
         { message: 'Already submitted', score: teamData[stationKey] },
-        { status: 200 }
+        { status: 200, headers: CORS_HEADERS }
       );
     }
 
@@ -53,11 +72,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { success: true, score, station: stationNum },
-      { status: 200 }
+      { status: 200, headers: CORS_HEADERS }
     );
 
   } catch (err) {
     console.error('Score API error:', err);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Server error' },
+      { status: 500, headers: CORS_HEADERS }
+    );
   }
 }
