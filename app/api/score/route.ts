@@ -71,14 +71,8 @@ export async function POST(req: NextRequest) {
     const completedStations = teamData.completedStations || [];
     const currentAttempts   = teamData[attemptKey] || 0;
 
-    // ── Always increment attempt count ────────────────────────────────────
-    await teamDoc.ref.update({
-      [attemptKey]: FieldValue.increment(1),
-    });
-
-    console.log(`Attempt #${currentAttempts + 1} for team=${teamCode} station=${stationNum}`);
-
     // ── If fail, just register attempt — don't save score ─────────────────
+    // ✅ FIX: moved BEFORE the increment so fails don't burn attempt budget
     if (isFail) {
       console.log('Fail attempt registered — no score saved');
       return NextResponse.json(
@@ -86,6 +80,14 @@ export async function POST(req: NextRequest) {
         { status: 200, headers: CORS_HEADERS }
       );
     }
+
+    // ── Increment attempt count only for non-fail (winning) attempts ──────
+    // ✅ FIX: only runs when a real score is being submitted
+    await teamDoc.ref.update({
+      [attemptKey]: FieldValue.increment(1),
+    });
+
+    console.log(`Attempt #${currentAttempts + 1} for team=${teamCode} station=${stationNum}`);
 
     // ── Guard: already submitted a winning score ───────────────────────────
     if (completedStations.includes(stationNum)) {
@@ -101,7 +103,7 @@ export async function POST(req: NextRequest) {
     if      (currentAttempts === 1) cappedScore = Math.min(score, 800);
     else if (currentAttempts === 2) cappedScore = Math.min(score, 600);
     else if (currentAttempts >= 3)  cappedScore = Math.min(score, 400);
-    // currentAttempts === 0 → first attempt → no cap → full score
+    // currentAttempts === 0 → first winning attempt → no cap → full score
 
     console.log(`Score: raw=${score} attempts=${currentAttempts} capped=${cappedScore}`);
 
